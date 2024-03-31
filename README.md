@@ -65,3 +65,39 @@ java -jar target/lucene-geo-gazetteer-*.jar
 ```bash
 curl http://localhost:8765
 ```
+
+
+import csv
+import requests
+from tika import parser
+
+# Assuming the GeoGazetteer REST server is running at this URL
+geo_gazetteer_url = 'http://localhost:8765'
+
+# Function to get geographic data from text using Tika GeoTopicParser
+def get_geodata(text):
+    headers = {'Accept': 'application/json'}
+    response = requests.post(geo_gazetteer_url, data=text, headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+# Load your BFRO sightings data
+with open('bfro_sightings.csv', 'r') as csvfile:
+    reader = csv.DictReader(csvfile)
+    sightings = [row for row in reader]
+
+# Iterate through the sightings and enrich with location data
+for sighting in sightings:
+    text = sighting['sighting_description']  # need to change
+    geo_data = get_geodata(text)
+    sighting['location_name'] = geo_data['location_name'] if geo_data else None
+    sighting['latitude'] = geo_data['latitude'] if geo_data else None
+    sighting['longitude'] = geo_data['longitude'] if geo_data else None
+
+# Save the enriched data back to a new CSV file
+with open('bfro_sightings_enriched.csv', 'w', newline='') as csvfile:
+    fieldnames = sightings[0].keys()
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerows(sightings)
