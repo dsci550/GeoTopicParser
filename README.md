@@ -101,3 +101,29 @@ with open('bfro_sightings_enriched.csv', 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
     writer.writerows(sightings)
+
+
+
+在Linux系统中，$HOME环境变量通常代表当前用户的主目录，其通常是/home/username，其中username是您的用户名。如果您看到指示HOME lucene-geo-gazetteer src，这可能是在描述路径时的一个格式错误，它可能应该是$HOME/lucene-geo-gazetteer/src。如果确实如此，那么下面是您应该使用的命令：
+
+从您的主目录开始，克隆lucene-geo-gazetteer仓库：
+bash
+Copy code
+cd $HOME
+git clone https://github.com/chrismattmann/lucene-geo-gazetteer.git
+进入克隆的仓库目录：
+bash
+Copy code
+cd $HOME/lucene-geo-gazetteer
+运行Maven构建命令：
+bash
+Copy code
+mvn install assembly:assembly
+接下来，要将lucene-geo-gazetteer的bin目录添加到您的PATH环境变量中，确保您可以从任何地方运行其提供的脚本。为此，您需要编辑您的shell配置文件（取决于您使用的shell，比如.bashrc或.profile），然后将路径添加到PATH变量中。
+如果您使用的是Bash shell，可以这样做：
+
+bash
+Copy code
+echo 'export PATH=$PATH:$HOME/lucene-geo-gazetteer/src/main/bin' >> ~/.bashrc
+source ~/.bashrc
+确保您替换命令中的路径以匹配您的实际目录结构。以上命令会把lucene-geo-gazetteer的bin目录添加到PATH环境变量，并立即应用更改。如果您的shell不是Bash，您可能需要编辑不同的配置文件，比如.zshrc或.profile。
