@@ -127,3 +127,28 @@ Copy code
 echo 'export PATH=$PATH:$HOME/lucene-geo-gazetteer/src/main/bin' >> ~/.bashrc
 source ~/.bashrc
 确保您替换命令中的路径以匹配您的实际目录结构。以上命令会把lucene-geo-gazetteer的bin目录添加到PATH环境变量，并立即应用更改。如果您的shell不是Bash，您可能需要编辑不同的配置文件，比如.zshrc或.profile。
+
+import requests
+
+def extract_geo_info(file_path):
+    url = 'http://localhost:9998/rmeta'
+    headers = {'Content-Disposition': f'attachment; filename={file_path}'}
+    
+    with open(file_path, 'rb') as file:
+        response = requests.put(url, headers=headers, data=file)
+    
+    if response.status_code == 200:
+        parsed = response.json()[0]
+        geo_info = parsed.get('Geographic_NAME', 'Unknown')
+        lat = parsed.get('Geographic_LATITUDE', 'Unknown')
+        lng = parsed.get('Geographic_LONGITUDE', 'Unknown')
+        return geo_info, lat, lng
+    else:
+        print(f"Error: {response.status_code}")
+        return 'Unknown', 'Unknown', 'Unknown'
+
+# 测试函数
+file_path = '/path/to/your/geotopic/file.polar.geot'  # 用实际测试文件的路径替换
+location_name, latitude, longitude = extract_geo_info(file_path)
+print(location_name, latitude, longitude)
+
